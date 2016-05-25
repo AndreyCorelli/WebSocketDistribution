@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using SharpExtensionsUtil.Logging;
 using SharpExtensionsUtil.Util;
+using WebSocket4Net;
 using WebSocketDistribution.Model;
 
 namespace WebSocketDistribution.Test
@@ -62,6 +64,19 @@ namespace WebSocketDistribution.Test
                 Thread.Sleep(1000);
             }
             distr.Stop();
+        }
+
+        [Test]
+        public void ClientWsTest()
+        {
+            const string uri = "ws://127.0.0.1:19006";
+            var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            distr.Start();
+            Thread.Sleep(1300);
+            var client = new WebSocketClient();
+            client.Setup("ws://127.0.0.1:19006", "basic", WebSocketVersion.Rfc6455);
+            client.Start();
+            Thread.Sleep(1300);
         }
 
         [Test]

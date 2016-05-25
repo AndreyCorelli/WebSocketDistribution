@@ -76,12 +76,17 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WebSocket4Net, Version=0.14.1.0, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebSocket4Net.0.14.1\lib\net45\WebSocket4Net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\DistributingQuotesStorage.cs" />
     <Compile Include="Model\Mt4Quote.cs" />
     <Compile Include="Model\QuoteData.cs" />
     <Compile Include="Model\QuoteNameAlias.cs" />
+    <Compile Include="Model\WebSocketClient.cs" />
     <Compile Include="Model\WebSocketDistributor.cs" />
     <Compile Include="Model\WebSocketQuoteSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

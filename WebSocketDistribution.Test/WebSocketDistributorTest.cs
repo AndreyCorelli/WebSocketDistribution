@@ -72,12 +72,12 @@ namespace WebSocketDistribution.Test
             const string uri = "ws://127.0.0.1:19006";
             var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
             distr.Start();
-            Thread.Sleep(300);
+            Thread.Sleep(1000);
 
             var client = new WebSocketClient();
-            client.Setup("ws://127.0.0.1:19006", "basic", WebSocketVersion.Rfc6455);
+            client.Setup(uri, "basic", WebSocketVersion.Rfc6455);
             client.Start();
-
+            Thread.Sleep(1000);
             distr.EnqueueQuotes(quotes);
             for (var i = 0; i < 15; i++)
             {
@@ -86,6 +86,18 @@ namespace WebSocketDistribution.Test
             }
             Thread.Sleep(2300);
 
+            distr.Stop();
+            distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            distr.Start();
+
+            Thread.Sleep(2500);
+
+            for (var i = 0; i < 15; i++)
+            {
+                distr.EnqueueQuotes(new List<QuoteData>(1) { quotes[i] });
+                Thread.Sleep(150);
+            }
+            distr.Stop();
         }
 
         [Test]

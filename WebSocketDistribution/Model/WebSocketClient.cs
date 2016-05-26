@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,77 +32,35 @@ namespace WebSocketDistribution.Model
         public void Start()
         {
             websocketClient.Open();
-
             websocketClient.Send("Hello world");
-            //            char keyStroked;
-            //
-            //            while (true)
-            //            {
-            //                keyStroked = Console.ReadKey().KeyChar;
-            //
-            //                if (keyStroked.Equals('q'))
-            //                {
-            //                    Stop();
-            //                    return;
-            //                }
-            //                else
-            //                {
-            //                    if (keyStroked.Equals('s'))
-            //                    {
-            //                        Console.WriteLine();
-            //                        Console.WriteLine("Put here your message to server: ");
-            //
-            //                        string message = Console.ReadLine();
-            //
-            //                        websocketClient.Send(message);
-            //                    }
-            //
-            //                    ShowAvailableOptions();
-            //                    continue;
-            //                }
-            //            }
         }
 
         private void Stop()
         {
             websocketClient.Close();
 
-            Console.WriteLine();
-            Console.WriteLine("Client disconnected!");
-        }
-
-        private void ShowAvailableOptions()
-        {
-            Console.WriteLine();
-            Console.WriteLine("Available options: ");
-            Console.WriteLine("Press 's' key to send message to server");
-            Console.WriteLine("Press 'q' key to close connection");
         }
 
         private void websocketClient_Opened(object sender, EventArgs e)
         {
-            Console.WriteLine();
-            Console.WriteLine("Client successfully connected.");
-            Console.WriteLine();
+            Debug.WriteLine("Client successfully connected.");
 
-            websocketClient.Send("Hello World!");
+//            websocketClient.Send("Hello World!");
 
-            ShowAvailableOptions();
         }
 
         private void websocketClient_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Console.WriteLine();
-            Console.WriteLine("Message Received. Server answered: " + e.Message);
+            Debug.WriteLine("Message Received. Server answered: " + e.Message);
         }
 
         private void websocketClient_Error(object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
-            Console.WriteLine(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+            Debug.WriteLine(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
 
             if (e.Exception.InnerException != null)
             {
-                Console.WriteLine(e.Exception.InnerException.GetType());
+                Debug.WriteLine(e.Exception.InnerException.GetType());
             }
 
             return;

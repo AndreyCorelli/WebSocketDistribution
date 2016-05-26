@@ -72,11 +72,20 @@ namespace WebSocketDistribution.Test
             const string uri = "ws://127.0.0.1:19006";
             var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
             distr.Start();
-            Thread.Sleep(1300);
+            Thread.Sleep(300);
+
             var client = new WebSocketClient();
             client.Setup("ws://127.0.0.1:19006", "basic", WebSocketVersion.Rfc6455);
             client.Start();
-            Thread.Sleep(1300);
+
+            distr.EnqueueQuotes(quotes);
+            for (var i = 0; i < 15; i++)
+            {
+                distr.EnqueueQuotes(new List<QuoteData>(1) { quotes[i] });
+                Thread.Sleep(150);
+            }
+            Thread.Sleep(2300);
+
         }
 
         [Test]

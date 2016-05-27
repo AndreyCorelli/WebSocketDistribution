@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using SharpExtensionsUtil.Extension;
 using SharpExtensionsUtil.Logging;
 using SharpExtensionsUtil.ThreadSafe;
@@ -19,6 +22,8 @@ namespace WebSocketDistribution.Model
         private readonly DistributingQuotesStorage storage;
 
         private readonly int port;
+
+        private readonly ConcurrentBag<WebSocketSession> clients = new ConcurrentBag<WebSocketSession>();  
 
         public WebSocketDistributor(int port, int distributeInterval,
             string symbolsSettingsPath, bool filterNotMatched)
@@ -62,12 +67,16 @@ namespace WebSocketDistribution.Model
                     m.ToStringWithTrend()));
                 try
                 {
-                    var sessions = server.GetAllSessions();
-                    if (sessions != null)
-                        foreach (var session in sessions)
-                        {
-                            session.Send(messageStr);
-                        }
+                    foreach (var session in clients)
+                    {
+                        session.Send(messageStr);
+                    }
+//                    var sessions = server.GetAllSessions();
+//                    if (sessions != null)
+//                        foreach (var session in sessions)
+//                        {
+//                            session.Send(messageStr);
+//                        }
                 }
                 catch (Exception ex)
                 {
@@ -96,7 +105,10 @@ namespace WebSocketDistribution.Model
             };
             server.NewSessionConnected += session =>
             {
+                clients.Add(session);
                 Logger.Info($"Web Socket - client connected: {session.Host}");
+                Debug.WriteLine("Server: new client connected");
+                session.Send("Hello new client!");
             };
 
             try

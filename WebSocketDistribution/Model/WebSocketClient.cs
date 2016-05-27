@@ -63,7 +63,7 @@ namespace WebSocketDistribution.Model
         {
             Debug.WriteLine("Client successfully connected.");
 
-            websocketClient.Send("Hello World!");
+//            websocketClient.Send("Hello server!");
 
         }
 

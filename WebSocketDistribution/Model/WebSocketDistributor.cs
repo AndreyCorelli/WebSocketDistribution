@@ -111,6 +111,12 @@ namespace WebSocketDistribution.Model
                 session.Send("Hello new client!");
             };
 
+            server.SessionClosed += (session, value) =>
+            {
+                Logger.Error($"Session closed: {session.SessionID} {value}");
+                clients.TryTake(out session);
+            };
+
             try
             {
                 server.Start();

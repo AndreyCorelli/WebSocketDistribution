@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WebSocket4Net;
 
@@ -49,7 +50,7 @@ namespace WebSocketDistribution.Model
             websocketClient.MessageReceived -= new EventHandler<MessageReceivedEventArgs>(websocketClient_MessageReceived);
             websocketClient.Closed -= new EventHandler(websocketClient_Closed);
             websocketClient.Close();
-
+            Thread.Sleep(1000);
             websocketClient = new WebSocket(this.url, this.protocol, this.version);
 
             websocketClient.Error += new EventHandler<SuperSocket.ClientEngine.ErrorEventArgs>(websocketClient_Error);

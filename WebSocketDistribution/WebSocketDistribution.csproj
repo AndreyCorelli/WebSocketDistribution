@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\DistributingQuotesStorage.cs" />
+    <Compile Include="Model\MessageStorage.cs" />
     <Compile Include="Model\Mt4Quote.cs" />
     <Compile Include="Model\QuoteData.cs" />
     <Compile Include="Model\QuoteNameAlias.cs" />

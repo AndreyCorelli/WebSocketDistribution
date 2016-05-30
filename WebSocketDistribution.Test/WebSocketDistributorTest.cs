@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -13,9 +12,9 @@ namespace WebSocketDistribution.Test
     [TestFixture]
     public class WebSocketDistributorTest
     {
-        private readonly List<QuoteData> quotes = new List<QuoteData>();
+        private readonly List<string> quotes = new List<string>();
 
-        private readonly string quoteSetsPath = ExecutablePath.Combine("Settings\\symbol_settings.txt");
+        private const int Port = 19006;
 
         [TestFixtureSetUp]
         public void Setup()
@@ -26,7 +25,7 @@ namespace WebSocketDistribution.Test
             for (var i = 0; i < 500; i++)
             {
                 for (var j = 0; j < names.Length; j++)
-                    quotes.Add(new QuoteData(names[j], prices[j] + i * 0.0001, prices[j] + i * 0.0001));
+                    quotes.Add(new QuoteData(names[j], prices[j] + i * 0.0001, prices[j] + i * 0.0001).ToString());
             }
         }
 
@@ -34,8 +33,7 @@ namespace WebSocketDistribution.Test
         [Ignore("not exactly unit test")]
         public void TestDistribute()
         {
-            var distr = new WebSocketDistributor(19006, 100,
-                quoteSetsPath, false);
+            var distr = new WebSocketDistributor(Port, 100);
 
             distr.EnqueueQuotes(quotes);
 
@@ -54,8 +52,7 @@ namespace WebSocketDistribution.Test
         [Ignore("not exactly unit test")]
         public void TestDistributeLong()
         {
-            var distr = new WebSocketDistributor(19006, 100,
-                quoteSetsPath, false);
+            var distr = new WebSocketDistributor(Port, 100);
             distr.Start();
 
             for (var i = 0; i < 30; i++)
@@ -69,8 +66,8 @@ namespace WebSocketDistribution.Test
         [Test]
         public void ClientWsTest()
         {
-            const string uri = "ws://127.0.0.1:19006";
-            var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            var uri = $"ws://127.0.0.1:{Port}";
+            var distr = new WebSocketDistributor(Port, 100);
             distr.Start();
             Thread.Sleep(1000);
 
@@ -81,20 +78,20 @@ namespace WebSocketDistribution.Test
             distr.EnqueueQuotes(quotes);
             for (var i = 0; i < 15; i++)
             {
-                distr.EnqueueQuotes(new List<QuoteData>(1) { quotes[i] });
+                distr.EnqueueQuotes(new List<string>(1) { quotes[i] });
                 Thread.Sleep(150);
             }
             Thread.Sleep(2300);
 
             distr.Stop();
-            distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            distr = new WebSocketDistributor(Port, 100);
             distr.Start();
 
             Thread.Sleep(2500);
 
             for (var i = 0; i < 15; i++)
             {
-                distr.EnqueueQuotes(new List<QuoteData>(1) { quotes[i] });
+                distr.EnqueueQuotes(new List<string>(1) { quotes[i] });
                 Thread.Sleep(150);
             }
             distr.Stop();
@@ -104,8 +101,8 @@ namespace WebSocketDistribution.Test
         //[Ignore("not exactly unit test")]
         public void TestDistributeConsume()
         {
-            const string uri = "ws://127.0.0.1:19006";
-            var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            var uri = $"ws://127.0.0.1:{Port}";
+            var distr = new WebSocketDistributor(Port, 100);
             distr.Start();
             Thread.Sleep(1300);
 
@@ -124,7 +121,7 @@ namespace WebSocketDistribution.Test
 
             for (var i = 0; i < 15; i++)
             {
-                distr.EnqueueQuotes(new List<QuoteData>(5) { quotes[i] });
+                distr.EnqueueQuotes(new List<string>(5) { quotes[i] });
                 Thread.Sleep(150);
             }
             Thread.Sleep(500);
@@ -138,8 +135,8 @@ namespace WebSocketDistribution.Test
         [Ignore("not exactly unit test")]
         public void TestDistributeConsumeReconnect()
         {
-            const string uri = "ws://127.0.0.1:19006";
-            var distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            var uri = $"ws://127.0.0.1:{Port}";
+            var distr = new WebSocketDistributor(Port, 100);
             distr.Start();
             Thread.Sleep(1300);
 
@@ -158,7 +155,7 @@ namespace WebSocketDistribution.Test
 
             for (var i = 0; i < 15; i++)
             {
-                distr.EnqueueQuotes(new List<QuoteData>(1) { quotes[i] });
+                distr.EnqueueQuotes(new List<string>(1) { quotes[i] });
                 Thread.Sleep(150);
             }
             Thread.Sleep(500);
@@ -177,7 +174,7 @@ namespace WebSocketDistribution.Test
 
 
             Thread.Sleep(4500);
-            distr = new WebSocketDistributor(19006, 100, quoteSetsPath, false);
+            distr = new WebSocketDistributor(Port, 100);
             distr.Start();
 
             Thread.Sleep(4500);

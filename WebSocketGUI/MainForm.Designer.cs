@@ -138,7 +138,7 @@
             this.tbHost.Name = "tbHost";
             this.tbHost.Size = new System.Drawing.Size(138, 20);
             this.tbHost.TabIndex = 4;
-            this.tbHost.Text = "213.239.200.213:19006";
+            this.tbHost.Text = "ws://127.0.0.1:19006";
             // 
             // tbLog
             // 

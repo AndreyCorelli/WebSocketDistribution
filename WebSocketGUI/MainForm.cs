@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 using SharpExtensionsUtil.Converter;
+using WebSocket4Net;
 using WebSocketDistribution.Model;
 
 namespace WebSocketGUI
@@ -28,7 +29,7 @@ namespace WebSocketGUI
                 btnListen.Text = "Стоп";
                 return;
             }
-            host.Dispose();
+            host.Stop();
             host = null;
             btnListen.Text = "слушать";
         }
@@ -52,19 +53,25 @@ namespace WebSocketGUI
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
+            if (host != null)
+            {
+                LogMessage($"Подключено {host.SessionsCount()} клиентов");
+                return;
+            }
+
             if (client == null)
             {
                 client = new Client(tbHost.Text, LogMessage, OnMessageSafe);
                 btnConnect.Text = "Стоп";
                 return;
             }
-            client.Dispose();
+            client.Stop();
             client = null;
-            btnConnect.Text = "Подключиться";
+            btnConnect.Text = "подключиться";
         }
     }
 
-    class ServerHost : IDisposable
+    class ServerHost
     {
         private readonly WebSocketDistributor distributor;
 
@@ -88,7 +95,12 @@ namespace WebSocketGUI
             distrThread.Start();
         }
 
-        public void Dispose()
+        public int SessionsCount()
+        {
+            return distributor?.SessionsActive ?? 0;
+        }
+
+        public void Stop()
         {
             isStopping = true;
             distrThread.Join();
@@ -113,27 +125,28 @@ namespace WebSocketGUI
         }
     }
 
-    class Client : IDisposable
+    class Client
     {
-        private WebSocketQuoteSource listener;
+        private WebSocketClient listener;
 
         private readonly Action<string> onConnectionEvent;
 
         public Client(string uri, Action<string> onConnectionEvent, Action<string> onMessage)
         {
             this.onConnectionEvent = onConnectionEvent;
-            listener = new WebSocketQuoteSource(onMessage, OnConnectionEvent);
-            listener.Connect(uri);
+            listener = new WebSocketClient();
+            listener.Setup(uri, "basic", WebSocketVersion.Rfc6455, onMessage, OnConnectionEvent);
+            listener.Start();
         }
 
-        private void OnConnectionEvent(WebSocketQuoteSource.ConnectionEvent connectionEvent, string s, WebSocketQuoteSource arg3)
+        private void OnConnectionEvent(ConnectionEvent connectionEvent, string s)
         {
             onConnectionEvent($"{connectionEvent}: [{s}]");
         }
 
-        public void Dispose()
+        public void Stop()
         {
-            listener.Logout();
+            listener.Stop();
             listener = null;
         }
     }

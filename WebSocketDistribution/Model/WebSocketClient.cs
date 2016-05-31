@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using WebSocket4Net;
 
 namespace WebSocketDistribution.Model
@@ -14,21 +10,32 @@ namespace WebSocketDistribution.Model
         private WebSocket websocketClient;
 
         private string url;
+
         private string protocol;
+
         private WebSocketVersion version;
 
-        public void Setup(string url, string protocol, WebSocketVersion version)
+        public Action<string> onMessage;
+
+        public Action<ConnectionEvent, string> onEvent;
+
+        public volatile bool isStopping;
+
+        public void Setup(string url, string protocol, WebSocketVersion version,
+            Action<string> onMessage, Action<ConnectionEvent, string> onEvent)
         {
             this.url = url;
             this.protocol = protocol;
             this.version = WebSocketVersion.Rfc6455;
+            this.onMessage += onMessage;
+            this.onEvent += onEvent;
 
             websocketClient = new WebSocket(this.url, this.protocol, this.version);
 
-            websocketClient.Error += new EventHandler<SuperSocket.ClientEngine.ErrorEventArgs>(websocketClient_Error);
-            websocketClient.Opened += new EventHandler(websocketClient_Opened);
-            websocketClient.MessageReceived += new EventHandler<MessageReceivedEventArgs>(websocketClient_MessageReceived);
-            websocketClient.Closed += new EventHandler(websocketClient_Closed);
+            websocketClient.Error += websocketClient_Error;
+            websocketClient.Opened += websocketClient_Opened;
+            websocketClient.MessageReceived += websocketClient_MessageReceived;
+            websocketClient.Closed += websocketClient_Closed;
         }
 
         public void Start()
@@ -36,58 +43,60 @@ namespace WebSocketDistribution.Model
             websocketClient.Open();
         }
 
-        private void Stop()
+        public void Stop()
         {
+            isStopping = true;
             websocketClient.Close();
-
         }
 
         private void Restart()
         {
             Debug.WriteLine("Client restart.");
-            websocketClient.Error -= new EventHandler<SuperSocket.ClientEngine.ErrorEventArgs>(websocketClient_Error);
-            websocketClient.Opened -= new EventHandler(websocketClient_Opened);
-            websocketClient.MessageReceived -= new EventHandler<MessageReceivedEventArgs>(websocketClient_MessageReceived);
-            websocketClient.Closed -= new EventHandler(websocketClient_Closed);
+            websocketClient.Error -= websocketClient_Error;
+            websocketClient.Opened -= websocketClient_Opened;
+            websocketClient.MessageReceived -= websocketClient_MessageReceived;
+            websocketClient.Closed -= websocketClient_Closed;
             websocketClient.Close();
             Thread.Sleep(1000);
-            websocketClient = new WebSocket(this.url, this.protocol, this.version);
+            websocketClient = new WebSocket(url, protocol, version);
 
-            websocketClient.Error += new EventHandler<SuperSocket.ClientEngine.ErrorEventArgs>(websocketClient_Error);
-            websocketClient.Opened += new EventHandler(websocketClient_Opened);
-            websocketClient.MessageReceived += new EventHandler<MessageReceivedEventArgs>(websocketClient_MessageReceived);
-            websocketClient.Closed += new EventHandler(websocketClient_Closed);
+            websocketClient.Error += websocketClient_Error;
+            websocketClient.Opened += websocketClient_Opened;
+            websocketClient.MessageReceived += (sender, args) => onMessage(args.Message);
+            websocketClient.Closed += websocketClient_Closed;
             Start();
         }
 
         private void websocketClient_Opened(object sender, EventArgs e)
         {
             Debug.WriteLine("Client successfully connected.");
-
-//            websocketClient.Send("Hello server!");
-
+            onEvent(ConnectionEvent.Connected, "connected");
         }
 
         private void websocketClient_Closed(object sender, EventArgs e)
         {
             Debug.WriteLine("Client closed");
-            Restart();
+            onEvent(ConnectionEvent.Disconnected, "closed");
+            if (!isStopping)
+                Restart();
         }
 
         private void websocketClient_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            Debug.WriteLine("Message Received. Server answered: " + e.Message);
+            onMessage(e.Message);
         }
 
         private void websocketClient_Error(object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
+            onEvent(ConnectionEvent.Faulted, e.Exception.Message);
             Debug.WriteLine(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
 
             if (e.Exception.InnerException != null)
             {
                 Debug.WriteLine(e.Exception.InnerException.GetType());
             }
-            Restart();
+            if (!isStopping)
+                Restart();
         }
     }
 }

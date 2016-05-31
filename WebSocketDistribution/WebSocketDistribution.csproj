@@ -50,23 +50,29 @@
       <HintPath>..\packages\SharpUtil.1.0.10\lib\net45\SharpExtensionsUtil.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SuperSocket.Common">
-      <HintPath>lib\SuperSocket.Common.dll</HintPath>
+    <Reference Include="SuperSocket.Common, Version=1.6.4.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperSocket.Common.dll</HintPath>
     </Reference>
-    <Reference Include="SuperSocket.Dlr">
-      <HintPath>lib\SuperSocket.Dlr.dll</HintPath>
+    <Reference Include="SuperSocket.Dlr, Version=1.6.4.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperSocket.Dlr.dll</HintPath>
     </Reference>
-    <Reference Include="SuperSocket.Facility">
-      <HintPath>lib\SuperSocket.Facility.dll</HintPath>
+    <Reference Include="SuperSocket.Facility, Version=1.6.4.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperSocket.Facility.dll</HintPath>
     </Reference>
-    <Reference Include="SuperSocket.SocketBase">
-      <HintPath>lib\SuperSocket.SocketBase.dll</HintPath>
+    <Reference Include="SuperSocket.SocketBase, Version=1.6.4.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperSocket.SocketBase.dll</HintPath>
     </Reference>
-    <Reference Include="SuperSocket.SocketEngine">
-      <HintPath>lib\SuperSocket.SocketEngine.dll</HintPath>
+    <Reference Include="SuperSocket.SocketEngine, Version=1.6.4.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperSocket.SocketEngine.dll</HintPath>
     </Reference>
-    <Reference Include="SuperWebSocket">
-      <HintPath>lib\SuperWebSocket.dll</HintPath>
+    <Reference Include="SuperWebSocket, Version=0.10.0.0, Culture=neutral, PublicKeyToken=7ba53b9a7cef5d1c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\NonSVN\WebSocketDistribution\WebSocketDistribution\lib\SuperWebSocket.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -82,14 +88,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\DistributingQuotesStorage.cs" />
+    <Compile Include="Model\ConcurrentHashSet.cs" />
     <Compile Include="Model\MessageStorage.cs" />
     <Compile Include="Model\Mt4Quote.cs" />
     <Compile Include="Model\QuoteData.cs" />
     <Compile Include="Model\QuoteNameAlias.cs" />
     <Compile Include="Model\WebSocketClient.cs" />
     <Compile Include="Model\WebSocketDistributor.cs" />
-    <Compile Include="Model\WebSocketQuoteSource.cs" />
+    <Compile Include="Model\ConnectionEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

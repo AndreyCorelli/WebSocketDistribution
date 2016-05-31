@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,7 +20,7 @@ namespace WebSocketDistribution.Model
 
         private readonly int port;
 
-        private readonly ConcurrentBag<WebSocketSession> clients = new ConcurrentBag<WebSocketSession>();
+        private readonly ConcurrentHashSet<WebSocketSession> clients = new ConcurrentHashSet<WebSocketSession>();
 
         public Action<string> logMessage;
 
@@ -30,6 +29,8 @@ namespace WebSocketDistribution.Model
         public Action<string> onClientConnected;
 
         public Action<string> onClientDisconnected;
+
+        public int SessionsActive { get; private set; }
 
         public WebSocketDistributor(int port, int distributeInterval)
         {
@@ -68,16 +69,23 @@ namespace WebSocketDistribution.Model
                 var messageStr = string.Join(Environment.NewLine, pack);
                 try
                 {
-                    foreach (var session in clients)
+                    var clientsList = clients.GetItems();
+                    SessionsActive = clientsList.Count;
+                    foreach (var session in clientsList)
                     {
-                        session.Send(messageStr);
-                        // убить сессию, если она не отвечает?
+                        try
+                        {
+                            session.Send(messageStr);
+                        }
+                        catch
+                        {
+                            clients.TryRemove(session);
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    if (logMessage != null)
-                        logMessage($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
+                    logMessage?.Invoke($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
                     Logger.Error($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
                 }
             }
@@ -94,30 +102,24 @@ namespace WebSocketDistribution.Model
                 Mode = SocketMode.Tcp,
                 Name = "SuperWebSocket Server"
             };
-            Logger.Info($"WebSocketServer listens to {port}");
-            if (logMessage != null)
-                logMessage($"WebSocketServer listens to {port}");
+            logMessage?.Invoke($"WebSocketServer listens to {port}");
 
             server.Setup(cfg);
             server.NewMessageReceived += (session, value) =>
             {
-                if (onMsgReceived != null)
-                    onMsgReceived($"Web Socket - new message: {value}");
+                onMsgReceived?.Invoke($"Web Socket - new message: {value}");
             };
             server.NewSessionConnected += session =>
             {
-                clients.Add(session);
-                if (onClientConnected != null)
-                    onClientConnected($"Web Socket - client connected: {session.Host}");
+                clients.AddOrReplace(session);
+                onClientConnected?.Invoke($"Web Socket - client connected: {session.Host}");
                 Debug.WriteLine("Server: new client connected");
-                //session.Send("Hello new client!");
             };
 
             server.SessionClosed += (session, value) =>
             {
-                if (onClientDisconnected != null)
-                    onClientDisconnected($"Session closed: {session.SessionID} {value}");
-                clients.TryTake(out session);
+                onClientDisconnected?.Invoke($"Session closed: {session.SessionID} {value}");
+                clients.TryRemove(session);
             };
 
             try

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Threading;
 using NUnit.Framework;
 using SharpExtensionsUtil.Logging;
@@ -72,7 +72,8 @@ namespace WebSocketDistribution.Test
             Thread.Sleep(1000);
 
             var client = new WebSocketClient();
-            client.Setup(uri, "basic", WebSocketVersion.Rfc6455);
+            client.Setup(uri, "basic", WebSocketVersion.Rfc6455, s => Debug.WriteLine($"message received: {s}"),
+                (@event, s) => Debug.WriteLine($"Connection event: {s}"));
             client.Start();
             Thread.Sleep(1000);
             distr.EnqueueQuotes(quotes);
@@ -97,99 +98,99 @@ namespace WebSocketDistribution.Test
             distr.Stop();
         }
 
-        [Test]
+        //[Test]
+        ////[Ignore("not exactly unit test")]
+        //public void TestDistributeConsume()
+        //{
+        //    var uri = $"ws://127.0.0.1:{Port}";
+        //    var distr = new WebSocketDistributor(Port, 100);
+        //    distr.Start();
+        //    Thread.Sleep(1300);
+
+        //    var quotesRecv = new List<string>();
+        //    var events = new List<ConnectionEvent>();
+        //    var listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
+        //        (@event, s, sender) =>
+        //        {
+        //            events.Add(@event);
+        //            if (@event == ConnectionEvent.Disconnected ||
+        //                @event == ConnectionEvent.Faulted)
+        //                sender.Reconnect();
+        //        });
+        //    listener.Connect(uri);
+        //    Thread.Sleep(3800);
+
+        //    for (var i = 0; i < 15; i++)
+        //    {
+        //        distr.EnqueueQuotes(new List<string>(5) { quotes[i] });
+        //        Thread.Sleep(150);
+        //    }
+        //    Thread.Sleep(500);
+        //    distr.Stop();
+
+        //    listener.Logout();
+        //    //Assert.AreEqual(quotes.Count, quotesRecv.Count);
+        //}
+
+        //[Test]
         //[Ignore("not exactly unit test")]
-        public void TestDistributeConsume()
-        {
-            var uri = $"ws://127.0.0.1:{Port}";
-            var distr = new WebSocketDistributor(Port, 100);
-            distr.Start();
-            Thread.Sleep(1300);
+        //public void TestDistributeConsumeReconnect()
+        //{
+        //    var uri = $"ws://127.0.0.1:{Port}";
+        //    var distr = new WebSocketDistributor(Port, 100);
+        //    distr.Start();
+        //    Thread.Sleep(1300);
 
-            var quotesRecv = new List<string>();
-            var events = new List<WebSocketQuoteSource.ConnectionEvent>();
-            var listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
-                (@event, s, sender) =>
-                {
-                    events.Add(@event);
-                    if (@event == WebSocketQuoteSource.ConnectionEvent.Disconnected ||
-                        @event == WebSocketQuoteSource.ConnectionEvent.Faulted)
-                        sender.Reconnect();
-                });
-            listener.Connect(uri);
-            Thread.Sleep(3800);
+        //    var quotesRecv = new List<string>();
+        //    var events = new List<ConnectionEvent>();
+        //    var listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
+        //        (@event, s, sender) =>
+        //        {
+        //            events.Add(@event);
+        //            if (@event == ConnectionEvent.Disconnected ||
+        //                @event == ConnectionEvent.Faulted)
+        //                sender.Reconnect();
+        //        });
+        //    listener.Connect(uri);
+        //    Thread.Sleep(3800);
 
-            for (var i = 0; i < 15; i++)
-            {
-                distr.EnqueueQuotes(new List<string>(5) { quotes[i] });
-                Thread.Sleep(150);
-            }
-            Thread.Sleep(500);
-            distr.Stop();
+        //    for (var i = 0; i < 15; i++)
+        //    {
+        //        distr.EnqueueQuotes(new List<string>(1) { quotes[i] });
+        //        Thread.Sleep(150);
+        //    }
+        //    Thread.Sleep(500);
+        //    distr.Stop();
 
-            listener.Logout();
-            //Assert.AreEqual(quotes.Count, quotesRecv.Count);
-        }
-
-        [Test]
-        [Ignore("not exactly unit test")]
-        public void TestDistributeConsumeReconnect()
-        {
-            var uri = $"ws://127.0.0.1:{Port}";
-            var distr = new WebSocketDistributor(Port, 100);
-            distr.Start();
-            Thread.Sleep(1300);
-
-            var quotesRecv = new List<string>();
-            var events = new List<WebSocketQuoteSource.ConnectionEvent>();
-            var listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
-                (@event, s, sender) =>
-                {
-                    events.Add(@event);
-                    if (@event == WebSocketQuoteSource.ConnectionEvent.Disconnected ||
-                        @event == WebSocketQuoteSource.ConnectionEvent.Faulted)
-                        sender.Reconnect();
-                });
-            listener.Connect(uri);
-            Thread.Sleep(3800);
-
-            for (var i = 0; i < 15; i++)
-            {
-                distr.EnqueueQuotes(new List<string>(1) { quotes[i] });
-                Thread.Sleep(150);
-            }
-            Thread.Sleep(500);
-            distr.Stop();
-
-            listener.Logout();
-            Thread.Sleep(4500);
-            listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
-                (@event, s, sender) =>
-                {
-                    events.Add(@event);
-                    if (@event == WebSocketQuoteSource.ConnectionEvent.Disconnected ||
-                        @event == WebSocketQuoteSource.ConnectionEvent.Faulted)
-                        sender.Reconnect();
-                });
+        //    listener.Logout();
+        //    Thread.Sleep(4500);
+        //    listener = new WebSocketQuoteSource(s => quotesRecv.Add(s),
+        //        (@event, s, sender) =>
+        //        {
+        //            events.Add(@event);
+        //            if (@event == ConnectionEvent.Disconnected ||
+        //                @event == ConnectionEvent.Faulted)
+        //                sender.Reconnect();
+        //        });
 
 
-            Thread.Sleep(4500);
-            distr = new WebSocketDistributor(Port, 100);
-            distr.Start();
+        //    Thread.Sleep(4500);
+        //    distr = new WebSocketDistributor(Port, 100);
+        //    distr.Start();
 
-            Thread.Sleep(4500);
-            listener.Connect(uri);
-            Thread.Sleep(3500);
+        //    Thread.Sleep(4500);
+        //    listener.Connect(uri);
+        //    Thread.Sleep(3500);
 
-            distr.EnqueueQuotes(quotes.Take(5).ToList());
-            Thread.Sleep(1000 * 3);
-            distr.EnqueueQuotes(quotes.Take(1).ToList());
-            Thread.Sleep(1000 * 3);
-            distr.Stop();
+        //    distr.EnqueueQuotes(quotes.Take(5).ToList());
+        //    Thread.Sleep(1000 * 3);
+        //    distr.EnqueueQuotes(quotes.Take(1).ToList());
+        //    Thread.Sleep(1000 * 3);
+        //    distr.Stop();
 
-            listener.Logout();
+        //    listener.Logout();
 
-            //Assert.AreEqual(quotes.Count, quotesRecv.Count);
-        }
+        //    //Assert.AreEqual(quotes.Count, quotesRecv.Count);
+        //}
     }
 }

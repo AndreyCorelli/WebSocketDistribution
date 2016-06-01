@@ -107,19 +107,43 @@ namespace WebSocketDistribution.Model
             server.Setup(cfg);
             server.NewMessageReceived += (session, value) =>
             {
-                onMsgReceived?.Invoke($"Web Socket - new message: {value}");
-            };
+                try
+                {
+                    onMsgReceived?.Invoke($"Web Socket - new message: {value}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.ToString());
+                }
+        };
             server.NewSessionConnected += session =>
             {
-                clients.AddOrReplace(session);
-                onClientConnected?.Invoke($"Web Socket - client connected: {session.Host}");
-                Debug.WriteLine("Server: new client connected");
+                try
+                {
+                    clients.AddOrReplace(session);
+                    onClientConnected?.Invoke($"Web Socket - client connected: {session.Host}");
+                    Debug.WriteLine("Server: new client connected");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.ToString());
+                }
             };
 
             server.SessionClosed += (session, value) =>
             {
-                onClientDisconnected?.Invoke($"Session closed: {session.SessionID} {value}");
-                clients.TryRemove(session);
+                try
+                {
+                    onClientDisconnected?.Invoke($"Session closed: {session.SessionID} {value}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.ToString());
+                }
+                finally
+                {
+                    clients.TryRemove(session);
+                }
             };
 
             try

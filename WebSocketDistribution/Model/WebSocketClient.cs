@@ -69,34 +69,62 @@ namespace WebSocketDistribution.Model
 
         private void websocketClient_Opened(object sender, EventArgs e)
         {
-            Debug.WriteLine("Client successfully connected.");
-            onEvent(ConnectionEvent.Connected, "connected");
+            try
+            { 
+                Debug.WriteLine("Client successfully connected.");
+                onEvent(ConnectionEvent.Connected, "connected");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
         private void websocketClient_Closed(object sender, EventArgs e)
         {
-            Debug.WriteLine("Client closed");
-            onEvent(ConnectionEvent.Disconnected, "closed");
-            if (!isStopping)
-                Restart();
+            try
+            { 
+                Debug.WriteLine("Client closed");
+                onEvent(ConnectionEvent.Disconnected, "closed");
+                if (!isStopping)
+                    Restart();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
         private void websocketClient_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            onMessage(e.Message);
+            try
+            { 
+                onMessage(e.Message);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
 
         private void websocketClient_Error(object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
-            onEvent(ConnectionEvent.Faulted, e.Exception.Message);
-            Debug.WriteLine(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
-
-            if (e.Exception.InnerException != null)
+            try
             {
-                Debug.WriteLine(e.Exception.InnerException.GetType());
+                onEvent(ConnectionEvent.Faulted, e.Exception.Message);
+                Debug.WriteLine(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace);
+
+                if (e.Exception.InnerException != null)
+                {
+                    Debug.WriteLine(e.Exception.InnerException.GetType());
+                }
+                if (!isStopping)
+                    Restart();
             }
-            if (!isStopping)
-                Restart();
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
         }
     }
 }

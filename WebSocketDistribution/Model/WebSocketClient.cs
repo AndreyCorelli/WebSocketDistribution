@@ -15,18 +15,18 @@ namespace WebSocketDistribution.Model
 
         private WebSocketVersion version;
 
-        public Action<string> onMessage;
+        private Action<string> onMessage;
 
-        public Action<ConnectionEvent, string> onEvent;
+        private Action<ConnectionEvent, string> onEvent;
 
-        public volatile bool isStopping;
+        private volatile bool isStopping;
 
         public void Setup(string url, string protocol, WebSocketVersion version,
             Action<string> onMessage, Action<ConnectionEvent, string> onEvent)
         {
             this.url = url;
             this.protocol = protocol;
-            this.version = WebSocketVersion.Rfc6455;
+            this.version = version;
             this.onMessage += onMessage;
             this.onEvent += onEvent;
 

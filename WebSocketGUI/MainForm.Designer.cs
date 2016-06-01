@@ -158,6 +158,7 @@
             this.Controls.Add(this.panelTop);
             this.Name = "MainForm";
             this.Text = "WebSocket GUI";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.panelLeft.ResumeLayout(false);

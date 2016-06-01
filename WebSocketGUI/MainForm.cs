@@ -69,6 +69,11 @@ namespace WebSocketGUI
             client = null;
             btnConnect.Text = "подключиться";
         }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            host.Stop();
+        }
     }
 
     class ServerHost

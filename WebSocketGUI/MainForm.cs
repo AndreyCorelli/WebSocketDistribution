@@ -36,7 +36,13 @@ namespace WebSocketGUI
 
         private void LogMessage(string str)
         {
-            Invoke(new Action<string>(s => tbLog.AppendText(s + Environment.NewLine)), str);
+            try
+            {
+                Invoke(new Action<string>(s => tbLog.AppendText(s + Environment.NewLine)), str);
+            }
+            catch
+            {
+            }
         }
 
         private void OnMessageSafe(string msg)
@@ -72,7 +78,8 @@ namespace WebSocketGUI
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            host.Stop();
+            host?.Stop();
+            client?.Stop();
         }
     }
 

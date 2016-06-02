@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using SharpExtensionsUtil.Extension;
-using SharpExtensionsUtil.Logging;
-using SharpExtensionsUtil.ThreadSafe;
-using SharpExtensionsUtil.Util;
 using SuperSocket.SocketBase;
 using SuperSocket.SocketBase.Config;
 using SuperWebSocket;
@@ -40,13 +36,6 @@ namespace WebSocketDistribution.Model
             {
                 new Schedule(Distribute, distributeInterval)
             };
-        }
-
-        public static WebSocketDistributor MakeDistributor()
-        {
-            return new WebSocketDistributor(
-                AppConfig.GetIntParam("WebSocketFeeder.Port", 19004),
-                AppConfig.GetIntParam("WebSocketFeeder.IntervalMils", 250));
         }
 
         public void EnqueueQuotes(List<string> quotesToDistribute)
@@ -86,7 +75,7 @@ namespace WebSocketDistribution.Model
                 catch (Exception ex)
                 {
                     logMessage?.Invoke($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
-                    Logger.Error($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
+                    //Logger.Error($"Error in WebSocketDistributor.Send(): {ex.ToShortString()}");
                 }
             }
         }
@@ -113,9 +102,9 @@ namespace WebSocketDistribution.Model
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString());
+                    Debug.Write(ex.ToString());
                 }
-        };
+            };
             server.NewSessionConnected += session =>
             {
                 try
@@ -126,7 +115,7 @@ namespace WebSocketDistribution.Model
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString());
+                    Debug.Write(ex.ToString());
                 }
             };
 
@@ -138,7 +127,7 @@ namespace WebSocketDistribution.Model
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex.ToString());
+                    Debug.Write(ex.ToString());
                 }
                 finally
                 {
@@ -152,7 +141,7 @@ namespace WebSocketDistribution.Model
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error in WebSocket: {ex}");
+                Debug.Write($"Error in WebSocket: {ex}");
                 throw;
             }
 

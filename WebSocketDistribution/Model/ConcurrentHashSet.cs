@@ -10,8 +10,6 @@ namespace WebSocketDistribution.Model
 
         private readonly ReaderWriterLockSlim locker = new ReaderWriterLockSlim();
 
-        //private const int LockTimeout = 1000;
-
         public List<T> GetItems()
         {
             locker.EnterReadLock();

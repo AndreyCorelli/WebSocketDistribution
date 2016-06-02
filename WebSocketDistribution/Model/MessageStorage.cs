@@ -13,8 +13,6 @@ namespace WebSocketDistribution.Model
         public void StoreMessages(List<string> messsagesToDistribute)
         {
             if (messsagesToDistribute.Count == 0) return;
-            // определить тренд
-            if (messsagesToDistribute.Count == 0) return;
             listLocker.EnterWriteLock();
             try
             {

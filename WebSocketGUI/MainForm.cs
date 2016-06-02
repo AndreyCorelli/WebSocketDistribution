@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
-using SharpExtensionsUtil.Converter;
 using WebSocket4Net;
 using WebSocketDistribution.Model;
 
@@ -25,7 +24,7 @@ namespace WebSocketGUI
         {
             if (host == null)
             {
-                host = new ServerHost(tbPort.Text.ToIntSafe() ?? 19006, LogMessage, OnMessageSafe);
+                host = new ServerHost(int.Parse(tbPort.Text), LogMessage, OnMessageSafe);
                 btnListen.Text = "Стоп";
                 return;
             }
